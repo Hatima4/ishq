@@ -1,0 +1,44 @@
+Image: Normal-3484.png, No TB Detected, 99.99% confidence
+Image: Normal-3485.png, No TB Detected, 100.00% confidence
+Image: Normal-3486.png, No TB Detected, 100.00% confidence
+Image: Normal-3487.png, No TB Detected, 100.00% confidence
+Image: Normal-3488.png, No TB Detected, 100.00% confidence
+Image: Normal-3489.png, No TB Detected, 100.00% confidence
+Image: Normal-3490.png, No TB Detected, 100.00% confidence
+Image: Normal-3491.png, No TB Detected, 100.00% confidence
+Image: Normal-3492.png, No TB Detected, 100.00% confidence
+Image: Normal-3493.png, No TB Detected, 100.00% confidence
+Image: Normal-3494.png, No TB Detected, 100.00% confidence
+Image: Normal-3495.png, No TB Detected, 100.00% confidence
+Image: Normal-3496.png, No TB Detected, 100.00% confidence
+Image: Normal-3497.png, No TB Detected, 100.00% confidence
+Image: Normal-3498.png, No TB Detected, 100.00% confidence
+Image: Normal-3499.png, No TB Detected, 100.00% confidence
+Image: Normal-3500.png, No TB Detected, 100.00% confidence
+Image: Tuberculosis-19.png, TB Detected, 1.17% confidence
+Image: Tuberculosis-20.png, TB Detected, 1.55% confidence
+Image: Tuberculosis-21.png, TB Detected, 0.59% confidence
+Image: Tuberculosis-22.png, TB Detected, 0.46% confidence
+Image: Tuberculosis-23.png, TB Detected, 0.22% confidence
+Image: Tuberculosis-24.png, No TB Detected, 100.00% confidence
+Image: Tuberculosis-25.png, TB Detected, 1.68% confidence
+Image: Tuberculosis-26.png, No TB Detected, 100.00% confidence
+Image: Tuberculosis-27.png, TB Detected, 0.55% confidence
+Image: Tuberculosis-28.png, TB Detected, 0.50% confidence
+Image: Tuberculosis-29.png, TB Detected, 0.03% confidence
+Image: Tuberculosis-30.png, TB Detected, 1.53% confidence
+Image: Tuberculosis-31.png, TB Detected, 1.74% confidence
+Image: Tuberculosis-32.png, TB Detected, 0.53% confidence
+Image: Tuberculosis-33.png, TB Detected, 1.02% confidence
+Image: Tuberculosis-34.png, TB Detected, 2.12% confidence
+Image: Tuberculosis-35.png, TB Detected, 0.06% confidence
+Image: Tuberculosis-36.png, TB Detected, 0.19% confidence
+Image: Tuberculosis-37.png, TB Detected, 0.15% confidence
+Image: Tuberculosis-38.png, TB Detected, 2.40% confidence
+Image: Tuberculosis-39.png, TB Detected, 6.26% confidence
+Image: Tuberculosis-40.png, TB Detected, 9.58% confidence
+Image: Tuberculosis-41.png, TB Detected, 0.06% confidence
+Image: Tuberculosis-42.png, TB Detected, 0.16% confidence
+Image: Tuberculosis-43.png, TB Detected, 0.06% confidence
+Image: Tuberculosis-44.png, No TB Detected, 99.99% confidence
+Image: Tuberculosis-45.png, TB Detected, 0.22% confidence
