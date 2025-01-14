@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications import ResNet50, resnet50
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, Callback
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, Callback
 import os
 import numpy as np
 from sklearn.utils.class_weight import compute_class_weight
@@ -56,7 +56,7 @@ def build_model(base_trainable=False):
     model = Sequential([
         base_model,
         GlobalAveragePooling2D(),
-        Dense(128, activation='relu'),
+        Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)),
         Dropout(0.5),
         Dense(1, activation='sigmoid')
     ])
@@ -95,8 +95,8 @@ def train_model():
     print("Training the model...")
     train_datagen = ImageDataGenerator(
         preprocessing_function=resnet50.preprocess_input,
-        rotation_range=20, width_shift_range=0.2, height_shift_range=0.2,
-        zoom_range=0.2, horizontal_flip=True, shear_range=0.15
+        rotation_range=30, width_shift_range=0.3, height_shift_range=0.3,
+        zoom_range=0.3, horizontal_flip=True, shear_range=0.2
     )
     val_datagen = ImageDataGenerator(preprocessing_function=resnet50.preprocess_input)
 
@@ -114,18 +114,20 @@ def train_model():
     # Phase 1: Train top layers
     print("Phase 1: Training top layers...")
     model = build_model(base_trainable=False)
-    early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
     validation_stopper = ValidationStopper(validation_data=(val_data, val_labels), target_accuracy=0.95)
     checkpoint_phase1 = ModelCheckpoint('tb_detection_best_model_phase1.h5', monitor='val_loss', save_best_only=True)
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, min_lr=1e-6)
+
     model.fit(
-        train_generator, epochs=15, validation_data=val_generator,
-        class_weight=class_weights, callbacks=[early_stopping, validation_stopper, checkpoint_phase1]
+        train_generator, epochs=50, validation_data=val_generator,
+        class_weight=class_weights, callbacks=[early_stopping, validation_stopper, checkpoint_phase1, reduce_lr]
     )
 
     # Phase 2: Fine-tuning
     print("Phase 2: Fine-tuning the base model...")
     model = load_model('tb_detection_best_model_phase1.h5')
-    for layer in model.layers[0].layers[-50:]:
+    for layer in model.layers[0].layers:
         layer.trainable = True
     model.compile(
         optimizer=Adam(learning_rate=0.00001),
@@ -134,9 +136,11 @@ def train_model():
     )
     validation_stopper = ValidationStopper(validation_data=(val_data, val_labels), target_accuracy=0.98)
     checkpoint_final = ModelCheckpoint(model_path, monitor='val_loss', save_best_only=True)
+    reduce_lr_finetune = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, min_lr=1e-6)
+
     model.fit(
-        train_generator, epochs=5, validation_data=val_generator,
-        class_weight=class_weights, callbacks=[early_stopping, validation_stopper, checkpoint_final]
+        train_generator, epochs=30, validation_data=val_generator,
+        class_weight=class_weights, callbacks=[early_stopping, validation_stopper, checkpoint_final, reduce_lr_finetune]
     )
 
     print(f"Model saved as '{model_path}'")
@@ -144,7 +148,7 @@ def train_model():
 
 def analyze_test_images(image_dir, model):
     print(f"Analyzing test images in: {image_dir}...")
-    threshold = 0.0002
+    threshold = 0.0005
     for image_file in os.listdir(image_dir):
         image_path = os.path.join(image_dir, image_file)
         try:
