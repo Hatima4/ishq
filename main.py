@@ -10,9 +10,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
 
-
-
-
 warnings.filterwarnings("ignore", message=".*HDF5 file.*", category=UserWarning)
 
 # GPU memory growth configuration
@@ -58,57 +55,6 @@ def save_results_to_csv(results, filepath="results.csv"):
     df = pd.DataFrame(results)
     df.to_csv(filepath, index=False)
     print(f"Results saved to {filepath}")
-
-def grad_cam(model, img_array, layer_name="conv5_block3_out"):
-    """Generates a Grad-CAM heatmap for ResNet50."""
-    
-    # Convert img_array to a TensorFlow tensor if it's not already
-    img_array = tf.convert_to_tensor(img_array, dtype=tf.float32)
-
-    # Access the ResNet50 part of the model
-    resnet50_layer = model.get_layer("resnet50")  # This is the base ResNet50 model
-    
-    # Ensure that you get the output of the last convolutional block
-    grad_model = tf.keras.models.Model(
-        inputs=model.inputs,  # Use model.input
-        outputs=[resnet50_layer.get_layer('resnet50').output, model.outputs]  # Use ResNet50 conv layer output
-    )
-    
-    # Use GradientTape to compute the gradient
-    with tf.GradientTape() as tape:
-        tape.watch(img_array)  # Watch the image array
-        conv_output, predictions = grad_model(img_array)
-        class_idx = tf.argmax(predictions[0])  # Find the class index with highest prediction
-        loss = predictions[:, class_idx]  # Compute the loss for that class
-
-    grads = tape.gradient(loss, conv_output)  # Get the gradients
-    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))  # Pool the gradients across the spatial dimensions
-    conv_output = conv_output[0]  # Select the first image's output
-    heatmap = tf.reduce_sum(pooled_grads * conv_output, axis=-1)  # Weight the channels
-    heatmap = tf.maximum(heatmap, 0)  # Remove negative values
-    heatmap = heatmap / tf.math.reduce_max(heatmap)  # Normalize the heatmap
-
-    return heatmap.numpy()  # Return the heatmap as a numpy array
-
-
-
-def overlay_heatmap(original_img, heatmap, output_path):
-    """Overlays the heatmap on the original image and saves the result."""
-    heatmap = np.uint8(255 * heatmap)  # Scale heatmap to 0-255
-    heatmap = np.expand_dims(heatmap, axis=-1)
-    heatmap_img = tf.keras.preprocessing.image.array_to_img(heatmap)
-    heatmap_img = heatmap_img.resize(original_img.size)
-
-    # Convert heatmap to RGB and overlay
-    heatmap_colored = np.array(heatmap_img.convert("RGB"))
-    overlay = 0.4 * heatmap_colored + 0.6 * np.array(original_img)
-    overlay = np.clip(overlay, 0, 255).astype(np.uint8)
-
-    # Save overlay
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    plt.imsave(output_path, overlay)
-    print(f"Heatmap saved to {output_path}")
-
 
 def analyze_test_images(test_dir, model):
     print(f"Analyzing test images in: {test_dir}...")
@@ -161,10 +107,6 @@ def analyze_test_images(test_dir, model):
 
             print(f"Image: {image_file}, Predicted: {predicted_label}, Confidence: {prediction:.2f}")
 
-            # Generate and save Grad-CAM heatmap
-            heatmap = grad_cam(model, img_array)
-            overlay_heatmap(img, heatmap, output_path=f"heatmaps/{category}_{image_file}")
-
     # Calculate and display metrics
     print("\nClassification Report:")
     print(classification_report(y_true, y_pred, target_names=categories))
@@ -174,11 +116,7 @@ def analyze_test_images(test_dir, model):
 
     save_results_to_csv(results)
 
-
-
 def main():
-    # Print all layers to find the correct layer name for Grad-CAM
-    
     print("Welcome to the Tuberculosis Detection Program!")
 
     if not os.path.exists(test_dir):
@@ -193,7 +131,6 @@ def main():
     model = load_model(model_path)
 
     analyze_test_images(test_dir, model)
-
 
 if __name__ == "__main__":
     main()
